@@ -1,0 +1,21 @@
+#!/bin/bash
+
+echo "Download KoMPoST from GitHub:"
+git clone https://github.com/KMPST/KoMPoST.git
+
+echo "Download MUSIC from GitHub:"
+git clone https://github.com/MUSIC-fluid/MUSIC.git
+
+echo "Download iSS from GitHub:"
+git clone https://github.com/chunshen1987/iSS.git
+
+echo "Download SMASH from GitHub:"
+git clone https://github.com/smash-transport/smash.git
+
+echo "Download Pythia (used for SMASH):"
+wget https://pythia.org/download/pythia83/pythia8307.tgz
+
+echo "Download stable Eigen library version 3.4.0:"
+wget https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz
+
+echo "Downloaded all the modules successfully"
