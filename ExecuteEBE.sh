@@ -78,6 +78,9 @@ do
 echo "Processing file: $FILE"
 echo "Create MUSIC input file MODE 2"
 
+id=$(echo "$FILE" | grep -o -E '[0-9]+')
+EVENTNUMBER=$(echo $id | cut -d' ' -f1)
+
 # MUSIC input file
 # Change parameters here if needed!
 cat <<EOF >> ${EVENTNUMBER}.parameters_MUSIC.ini
