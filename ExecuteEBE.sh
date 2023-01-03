@@ -30,14 +30,14 @@ echo $NS
 # Change parameters here if needed!
 cat <<EOF >> parameters_KoMPoST.ini
 [KoMPoSTInputs]
-tIn = 0.2005;
-tOut = 1.2005;
+tIn = 0.001;
+tOut = 0.8;
 inputfile = ../$FILE
 outputfiletag = ../KoMPoST_output/$EVENTNUMBER.Tmunu
 
 [KoMPoSTParameters]
 EtaOverS = 0.16
-EtaOverSTemperatureScale = 0.1
+EtaOverSTemperatureScale = 0.0
 # 0 for free-streaming, 1 for "KoMPoST" EKT evolution
 EVOLUTION_MODE = 1
 # 0 or 1
@@ -47,7 +47,7 @@ MOMENTUM_PERTURBATIONS = 0
 DECOMPOSITION_METHOD = 1
 
 [EventInput]
-afm = 0.26
+afm = 0.1
 ns = $NS
 xstart = 0
 xend = `echo ${NS} 1 | awk '{print $1-$2}'`
@@ -106,7 +106,7 @@ s_factor  1.0   # normalization factor for initial profile
 boost_invariant 1       # whether the simulation is boost-invariant
 #
 # grid information
-Initial_time_tau_0 1.1005       # starting time of the hydrodynamic evolution (fm/c)
+Initial_time_tau_0 0.8       # starting time of the hydrodynamic evolution (fm/c)
 Total_evolution_time_tau 50.    # the maximum allowed running evolution time (fm/c) (need to be set to some large number)
 Delta_Tau 0.005                 # time step to use in the evolution [fm/c]
 #
@@ -215,7 +215,7 @@ deltaf_max_ratio = 1.0   # the maximum allowed size of delta f w.r.t f0
 
 quantum_statistics = 1   # include quantum statistics or not (1: yes, 0: no)
 
-output_samples_into_files = 0  # output particle samples into individual files
+output_samples_into_files = 1  # output particle samples into individual files
                                # for individual particle species
 store_samples_in_memory = 0  # flag to store particle samples in memory
 use_OSCAR_format = 1         # output results in OSCAR format
@@ -232,7 +232,7 @@ calculate_vn = 0         # 1/0: whether to calculate the
                          # dN/(pt dpt dphi dy) and v_n flows
                          # (they not required for MC-sampling)
 
-MC_sampling = 4          # 0/1/2/3: whether to perform Monte-Carlo sampling
+MC_sampling = 2          # 0/1/2/3: whether to perform Monte-Carlo sampling
                          # (not required for spectra calculation).
                          # 0: No sampling.
                          # 1: use dN_dxtdetady to sample.
@@ -284,9 +284,9 @@ y_LB = -5.0                  # lower bound for y-sampling;
 y_RB = 5.0                   # upper bound for y-sampling; used in
                              # "conventional" sampling
 
-eta_s_LB = -0.5              # lower bound for eta_s sampling; used only when
+eta_s_LB = -5.0              # lower bound for eta_s sampling; used only when
                              # sampling using total energy flux
-eta_s_RB = 0.5               # upper bound for eta_s sampling.
+eta_s_RB = 5.0               # upper bound for eta_s sampling.
 
 use_dynamic_maximum = 0      # 0/1: Whether to automatically reduce the
                              # guessed maximum after some calculations.
@@ -328,7 +328,7 @@ calculate_vn_to_order = 9              # v_n's are calculated up to this order
 sample_upto_desired_particle_number = 0  # flag to run sampling until desired
                                          # particle numbers is reached
 number_of_particles_needed = 100000      # number of hadrons to sample
-number_of_repeated_sampling = 4     # How many times should the sampling be
+number_of_repeated_sampling = 10     # How many times should the sampling be
                                        # repeated.
 maximum_sampling_events = 10000
 
@@ -437,7 +437,7 @@ General:
     Delta_Time:    0.1
     End_Time:      1000.0
     Randomseed:    1
-    Nevents:       4
+    Nevents:       10
 
 Output:
     Output_Interval: 1.0
@@ -460,7 +460,3 @@ mkdir ../../smash_output/Event${id}
 ./smash -i ./parameters_smash.yaml -o ../../smash_output/Event${id}
 rm parameters_smash.yaml
 done
-
-: << 'END_COMMENT'
-t
-END_COMMENT
