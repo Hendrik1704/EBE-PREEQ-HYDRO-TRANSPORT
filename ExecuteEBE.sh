@@ -331,7 +331,7 @@ calculate_vn_to_order = 9              # v_n's are calculated up to this order
 sample_upto_desired_particle_number = 0  # flag to run sampling until desired
                                          # particle numbers is reached
 number_of_particles_needed = 100000      # number of hadrons to sample
-number_of_repeated_sampling = 10     # How many times should the sampling be
+number_of_repeated_sampling = 1     # How many times should the sampling be
                                        # repeated.
 maximum_sampling_events = 10000
 
@@ -438,12 +438,12 @@ General:
     Modus:         List
     Time_Step_Mode: None
     Delta_Time:    0.1
-    End_Time:      1000.0
+    End_Time:      300.0
     Randomseed:    1
-    Nevents:       10
+    Nevents:       1
 
 Output:
-    Output_Interval: 1.0
+    Output_Interval: 10.0
     Particles:
         Format:          ["Oscar2013"]
 
@@ -456,7 +456,7 @@ Modi:
         # ./smash -i <path to config file> -c 'Modi: { List: { File_Directory: <path to file that is read in> } }
         File_Directory: "../../iSS_output_converted"
         File_Prefix: "OSCAR"
-        Shift_Id: 1
+        Shift_Id: $id
 EOF
 
 mkdir ../../smash_output/Event${id}
