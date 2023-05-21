@@ -12,7 +12,7 @@ At the moment the included modules are:
     - Here you have to provide energy-momentum tensor files in the directory `input_energy_momentum_tensors`. The energy momentum tensor names should be of the format `Tmunu_Event#_Ns#.dat` with the event number and the number of grid sites in each direction.
 
 - Pre-equilibrium evolution:
-    - [K&#x00F8MP&#x00F8ST](https://github.com/KMPST/KoMPoST)
+    - [KoMPoST](https://github.com/KMPST/KoMPoST)
 
 - Hydrodynamics:
     - [MUSIC](https://github.com/MUSIC-fluid/MUSIC)
