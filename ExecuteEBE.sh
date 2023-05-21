@@ -430,7 +430,6 @@ echo "Create SMASH input file"
 # SMASH input file
 # Change parameters here if needed!
 cat <<EOF >> parameters_smash.yaml
-Version: 1.8
 Logging:
     default: INFO
 
