@@ -12,7 +12,7 @@ cd iSS && mkdir -p build && cd build && rm -fr * && cmake .. && make -Bj && make
 echo "Build Pythia which is used in SMASH for the hadronic afterburner phase"
 tar xf pythia8309.tgz
 cd pythia8309
-./configure --cxx-common='-std=c++11 -march=native -O3 -fPIC'
+./configure --cxx-common='-std=c++17 -stdlib=libc++ -march=native -O3 -fPIC -pthread'
 make -j6 && cd ..
 
 echo "Prepare the Eigen library for SMASH"
