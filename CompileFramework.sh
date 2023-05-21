@@ -10,10 +10,10 @@ echo "Build iSS sampler to perform freeze out"
 cd iSS && mkdir -p build && cd build && rm -fr * && cmake .. && make -Bj && make install && cd .. && rm -fr build && cd ..
 
 echo "Build Pythia which is used in SMASH for the hadronic afterburner phase"
-tar xf pythia8307.tgz
-cd pythia8307
+tar xf pythia8309.tgz
+cd pythia8309
 ./configure --cxx-common='-std=c++11 -march=native -O3 -fPIC'
-make && cd ..
+make -j6 && cd ..
 
 echo "Prepare the Eigen library for SMASH"
 tar -xf eigen-3.4.0.tar.gz
