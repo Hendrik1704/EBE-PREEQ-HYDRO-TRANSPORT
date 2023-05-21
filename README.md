@@ -4,20 +4,20 @@ In this repository you find a numerical framework for (2+1)D event-by-event simu
 
 ## Modules
 
-The code packages can be downloaded from their corresponding git repositories using the bash script `GetModulesFromGit.sh` and compiled with the `CompileFramework.sh` script.
+The code packages can be downloaded from their corresponding git repositories using the bash script `GetModulesFromGit.sh` and compiled with the `CompileFramework.sh` script. In the latter you can adjust the number of cores used to compile the codes.
 
 At the moment the included modules are:
 
 - Initial conditions:
-    - Here you have to provide energy-momentum tensor files in the directory `input_energy_momentum_tensors`. The energy momentum tensor names should be of the format `Tmunu_Event#_Ns#.dat` with the event number and the number of grid sites in each direction.
+    - Here you have to provide energy-momentum tensor files in the directory `input_energy_momentum_tensors`. The energy momentum tensor names should be of the format `Tmunu_Event#_Ns#.dat` with the event number and the number of grid sites in each direction. As format for the tensors please use the one from the KoMPoST code (link below).
 
 - Pre-equilibrium evolution:
     - [KoMPoST](https://github.com/KMPST/KoMPoST)
 
-- Hydrodynamics:
+- Relativistic viscous hydrodynamics:
     - [MUSIC](https://github.com/MUSIC-fluid/MUSIC)
 
-- Particlization:
+- Cooper-Frye particlization:
     - [iSS](https://github.com/chunshen1987/iSS)
 
 - Hadronic transport:
