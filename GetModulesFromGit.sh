@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Download KoMPoST from GitHub:"
-git clone --depth 1 https://github.com/KMPST/KoMPoST.git
+git clone --depth 1 https://github.com/Hendrik1704/KoMPoST.git
 
 echo "Download MUSIC from GitHub:"
 git clone --depth 1 https://github.com/MUSIC-fluid/MUSIC.git

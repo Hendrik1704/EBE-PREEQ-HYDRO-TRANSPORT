@@ -12,7 +12,7 @@ At the moment the included modules are:
     - Here you have to provide energy-momentum tensor files in the directory `input_energy_momentum_tensors`. The energy momentum tensor names should be of the format `Tmunu_Event#_Ns#.dat` with the event number and the number of grid sites in each direction. As format for the tensors please use the one from the KoMPoST code (link below).
 
 - Pre-equilibrium evolution:
-    - [KoMPoST](https://github.com/KMPST/KoMPoST)
+    - [KoMPoST](https://github.com/KMPST/KoMPoST) (This is a slightly modified KoMPoST version, where $\nu_{\mathrm{eff}}=40$.)
 
 - Relativistic viscous hydrodynamics:
     - [MUSIC](https://github.com/MUSIC-fluid/MUSIC)
@@ -25,7 +25,7 @@ At the moment the included modules are:
 
 ## Usage
 
-Use the bash script `ExecuteEBE.sh` to change the parameters for the different codes and execute it for a production run. This file also contains comments for the different input parameters.  
+Use the bash script `ExecuteEBE.sh` to change the parameters for the different codes and execute it for a production run. This file also contains comments for the different input parameters.
 Be careful with parameter changes, as some parameters have to be changed consistently for multiple modules to the same values.
 
 If you have to abort a computation you can clear the result directories by running the `CleanResults.sh` script. Keep in mind that this script also deletes the outputs of SMASH at the end.
