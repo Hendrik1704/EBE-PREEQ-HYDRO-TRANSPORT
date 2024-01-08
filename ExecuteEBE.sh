@@ -5,14 +5,21 @@ echo "The energy momentum tensors names should be of the format 'Tmunu_Event#_Ns
 echo "The first number is the EventID and the second one the number of grid points in each direction Ns"
 echo "The first line of the energy momentum tensors should contain a header!"
 
+tau_EKT=0.001
+tau_hydro=0.8
+eta_s=0.16
+grid_spacing=0.1
+
 mkdir KoMPoST_output
+mkdir KoMPoST_output_transformed
 mkdir MUSIC_FOsurfaces
 mkdir MUSIC_InputParameters
 mkdir iSS_output
 mkdir iSS_output_converted
 mkdir smash_output
 
-INPUT_TMUNU_PATH="input_energy_mometum_tensors/*"
+cd KoMPoST
+INPUT_TMUNU_PATH="../input_energy_momentum_tensors/*"
 for FILE in $INPUT_TMUNU_PATH
 do
 
@@ -30,13 +37,13 @@ echo $NS
 # Change parameters here if needed!
 cat <<EOF >> parameters_KoMPoST.ini
 [KoMPoSTInputs]
-tIn = 0.001;
-tOut = 0.8;
-inputfile = ../$FILE
+tIn = $tau_EKT;
+tOut = $tau_hydro;
+inputfile = $FILE
 outputfiletag = ../KoMPoST_output/$EVENTNUMBER.Tmunu
 
 [KoMPoSTParameters]
-EtaOverS = 0.16
+EtaOverS = $eta_s
 EtaOverSTemperatureScale = 0.0
 # 0 for free-streaming, 1 for "KoMPoST" EKT evolution
 EVOLUTION_MODE = 1
@@ -47,7 +54,7 @@ MOMENTUM_PERTURBATIONS = 0
 DECOMPOSITION_METHOD = 1
 
 [EventInput]
-afm = 0.1
+afm = $grid_spacing
 ns = $NS
 xstart = 0
 xend = `echo ${NS} 1 | awk '{print $1-$2}'`
@@ -56,22 +63,23 @@ yend = `echo ${NS} 1 | awk '{print $1-$2}'`
 EOF
 
 echo "Execute KoMPoST"
-mv parameters_KoMPoST.ini KoMPoST/
-cd KoMPoST
 ./KoMPoST.exe parameters_KoMPoST.ini
-rm parameters_KoMPoST.ini
-cd ..
-
-done
-
 # clear the KoMPoST directory of all files which are not needed any more
-cd KoMPoST
+rm parameters_KoMPoST.ini
 rm *.txt
 cd ../KoMPoST_output
-find . -type f ! -name '*music_init_flowNonLinear_pimunuTransverse.txt' -delete
+# delete all the unused output to save disc space
+find . -type f ! -name '*.Tmunu.txt' -delete
+cd ..
+
+echo "Transforming $FILE into MUSIC input"
+python3 KoMPoST_to_MUSIC.py ./KoMPoST_output/$EVENTNUMBER.Tmunu.txt ./KoMPoST_output_transformed/$EVENTNUMBER.Tmunu.txt $tau_hydro $NS $NS $grid_spacing $grid_spacing
+cd KoMPoST
+done
+
 cd ../MUSIC
 
-INPUT_TMUNU_PATH_MUSIC="../KoMPoST_output/*"
+INPUT_TMUNU_PATH_MUSIC="../KoMPoST_output_transformed/*"
 for FILE in $INPUT_TMUNU_PATH_MUSIC
 do
 
@@ -109,7 +117,7 @@ s_factor  1.0   # normalization factor for initial profile
 boost_invariant 1       # whether the simulation is boost-invariant
 #
 # grid information
-Initial_time_tau_0 0.8       # starting time of the hydrodynamic evolution (fm/c)
+Initial_time_tau_0 $tau_hydro       # starting time of the hydrodynamic evolution (fm/c)
 Total_evolution_time_tau 50.    # the maximum allowed running evolution time (fm/c) (need to be set to some large number)
 Delta_Tau 0.005                 # time step to use in the evolution [fm/c]
 #
@@ -133,7 +141,7 @@ EOS_to_use 91                 # type of the equation of state
 # transport coefficients
 Viscosity_Flag_Yes_1_No_0 1     # turn on viscosity in the evolution
 Include_Shear_Visc_Yes_1_No_0 1 # include shear viscous effect
-Shear_to_S_ratio 0.16           # value of \eta/s
+Shear_to_S_ratio $eta_s           # value of \eta/s
 T_dependent_Shear_to_S_ratio  0 # flag to use temperature dep. \eta/s(T)
 Include_Bulk_Visc_Yes_1_No_0 0  # include bulk viscous effect
 T_dependent_Bulk_to_S_ratio 0   # include Temperature-dependent \zeta/s(T)
