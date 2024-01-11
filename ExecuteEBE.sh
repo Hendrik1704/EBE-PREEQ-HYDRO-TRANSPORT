@@ -69,11 +69,11 @@ rm parameters_KoMPoST.ini
 rm *.txt
 cd ../KoMPoST_output
 # delete all the unused output to save disc space
-find . -type f ! -name '*.Tmunu.txt' -delete
+find . -type f ! -name '*music_init_flowNonLinear_pimunuTransverse.txt' -delete
 cd ..
 
 echo "Transforming $FILE into MUSIC input"
-python3 KoMPoST_to_MUSIC.py ./KoMPoST_output/$EVENTNUMBER.Tmunu.txt ./KoMPoST_output_transformed/$EVENTNUMBER.Tmunu.txt $tau_hydro $NS $NS $grid_spacing $grid_spacing
+python3 KoMPoST_to_MUSIC.py ./KoMPoST_output/$EVENTNUMBER*music_init_flowNonLinear_pimunuTransverse.txt ./KoMPoST_output_transformed/$EVENTNUMBER.Tmunu.txt
 cd KoMPoST
 done
 
@@ -445,7 +445,7 @@ General:
     Modus:         List
     Time_Step_Mode: None
     Delta_Time:    0.1
-    End_Time:      300.0
+    End_Time:      1000.0
     Randomseed:    1
     Nevents:       1
 
