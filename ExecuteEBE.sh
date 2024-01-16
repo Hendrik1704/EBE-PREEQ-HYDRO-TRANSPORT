@@ -5,7 +5,7 @@ echo "The energy momentum tensors names should be of the format 'Tmunu_Event#_Ns
 echo "The first number is the EventID and the second one the number of grid points in each direction Ns"
 echo "The first line of the energy momentum tensors should contain a header!"
 
-tau_EKT=0.001
+tau_EKT=0.2005
 tau_hydro=0.8
 eta_s=0.16
 grid_spacing=0.1
@@ -103,7 +103,7 @@ mode 2          # this mode is evolution only
 # parameters for initial conditions
 ###################################
 #
-Initial_profile 9               # Read in initial profile from a file
+Initial_profile 94               # Read in initial profile from a file, 94: full T^\mu\nu and read bulk
 initialize_with_entropy 0       # 0: with energy density
 #
 Initial_Distribution_input_filename $FILE
@@ -143,22 +143,22 @@ Viscosity_Flag_Yes_1_No_0 1     # turn on viscosity in the evolution
 Include_Shear_Visc_Yes_1_No_0 1 # include shear viscous effect
 Shear_to_S_ratio $eta_s           # value of \eta/s
 T_dependent_Shear_to_S_ratio  0 # flag to use temperature dep. \eta/s(T)
-Include_Bulk_Visc_Yes_1_No_0 0  # include bulk viscous effect
-T_dependent_Bulk_to_S_ratio 0   # include Temperature-dependent \zeta/s(T)
+Include_Bulk_Visc_Yes_1_No_0 1  # include bulk viscous effect
+T_dependent_Bulk_to_S_ratio 8   # include Temperature-dependent \zeta/s(T)
 Include_second_order_terms 1    # include second order non-linear coupling terms
 Include_Rhob_Yes_1_No_0 0
 turn_on_baryon_diffusion 0
 kappa_coefficient 0.0
 #
 # switches to output evolution information
-output_evolution_data 0                 # flag to output evolution history to file
+output_evolution_data 5                 # flag to output evolution history to file
 output_movie_flag 0
 output_evolution_T_cut 0.145
 outputBinaryEvolution  1                # output evolution file in binary format
 output_evolution_every_N_eta  1         # output evolution file every Neta steps
 output_evolution_every_N_y  1           # output evolution file every Ny steps
 output_evolution_every_N_x  1           # output evolution file every Nx steps
-output_evolution_every_N_timesteps  10  # output evolution every Ntime steps
+output_evolution_every_N_timesteps  200  # output evolution every Ntime steps
 #
 #
 ###########################################
