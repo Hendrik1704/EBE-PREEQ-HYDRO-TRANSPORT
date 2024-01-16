@@ -19,6 +19,7 @@ echo "Prepare the Eigen library for SMASH"
 tar -xf eigen-3.4.0.tar.gz
 
 echo "Build SMASH as an hadronic afterburner"
-cd smash && mkdir build && cd build && cmake .. -DTRY_USE_ROOT=OFF -DPythia_CONFIG_EXECUTABLE=../../pythia8309/bin/pythia8-config -DCMAKE_PREFIX_PATH=../../eigen-3.4.0/ && make -j6
+##cd smash && mkdir build && cd build && cmake .. -DTRY_USE_ROOT=OFF -DPythia_CONFIG_EXECUTABLE=../../pythia8309/bin/pythia8-config -DCMAKE_PREFIX_PATH=../../eigen-3.4.0/ && make -j6
+cd smash && mkdir build && cd build && cmake .. -DTRY_USE_ROOT=OFF -DTRY_USE_HEPMC=OFF -DPythia_CONFIG_EXECUTABLE=../../pythia8309/bin/pythia8-config -DCMAKE_PREFIX_PATH=../../eigen-3.4.0/ && make -j6
 
 echo "Finished building all the modules successfully"
