@@ -4,7 +4,7 @@ echo "Download KoMPoST from GitHub:"
 git clone --depth 1 https://github.com/Hendrik1704/KoMPoST.git
 
 echo "Download MUSIC from GitHub:"
-git clone --depth 1 https://github.com/MUSIC-fluid/MUSIC.git
+git clone --depth 1 https://github.com/Hendrik1704/MUSIC
 
 echo "Download iSS from GitHub:"
 git clone --depth 1 https://github.com/chunshen1987/iSS.git

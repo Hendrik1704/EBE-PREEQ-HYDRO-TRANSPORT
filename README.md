@@ -15,7 +15,7 @@ At the moment the included modules are:
     - [KoMPoST](https://github.com/Hendrik1704/KoMPoST.git) (This is a slightly modified KoMPoST version, where $\nu_{\mathrm{eff}}=40$.)
 
 - Relativistic viscous hydrodynamics:
-    - [MUSIC](https://github.com/MUSIC-fluid/MUSIC)
+    - [MUSIC](https://github.com/MUSIC-fluid/MUSIC) (Modified version which can read in the bulk pressure and modified energy density from the KoMPoST_to_MUSIC script.)
 
 - Cooper-Frye particlization:
     - [iSS](https://github.com/chunshen1987/iSS)
