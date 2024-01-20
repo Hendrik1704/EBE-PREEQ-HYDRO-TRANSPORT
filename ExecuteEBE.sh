@@ -25,14 +25,11 @@ for FILE in $INPUT_TMUNU_PATH
 do
 
 echo "Processing file: $FILE"
-id=$(echo "$FILE" | grep -o -E '[0-9]+')
-EVENTNUMBER=$(echo $id | cut -d' ' -f1)
-NS=$(echo $id | cut -d' ' -f2)
-
-echo "Create KoMPoST input file for event:"
-echo $EVENTNUMBER
-echo "Create KoMPoST input file for grid with Ns:"
-echo $NS
+# Extract event number and NS from the file name
+EVENTNUMBER=$(echo "$FILE" | grep -o -E '[0-9]+' | head -n1)
+NS=$(echo "$FILE" | grep -o -E 'Ns([0-9]+)' | sed 's/Ns//')
+echo "Create KoMPoST input file for event: $EVENTNUMBER"
+echo "Create KoMPoST input file for grid with Ns: $NS"
 
 # KoMPoST input file
 # Change parameters here if needed!
