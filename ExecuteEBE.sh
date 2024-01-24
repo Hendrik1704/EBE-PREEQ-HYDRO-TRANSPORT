@@ -430,6 +430,7 @@ for FILE in $OSCAR_FILES_PATH
 do
 
 id=$(echo "$FILE" | grep -o -E '[0-9]+')
+EVENTNUMBER=$(echo $id | cut -d' ' -f1)
 
 echo "Processing file: $FILE"
 echo "Create SMASH input file"
@@ -462,10 +463,10 @@ Modi:
         # ./smash -i <path to config file> -c 'Modi: { List: { File_Directory: <path to file that is read in> } }
         File_Directory: "../../iSS_output_converted"
         File_Prefix: "OSCAR"
-        Shift_Id: $id
+        Shift_Id: $EVENTNUMBER
 EOF
 
-mkdir ../../smash_output/Event${id}
-./smash -i ./parameters_smash.yaml -o ../../smash_output/Event${id}
+mkdir ../../smash_output/Event${EVENTNUMBER}
+./smash -i ./parameters_smash.yaml -o ../../smash_output/Event${EVENTNUMBER}
 rm parameters_smash.yaml
 done
