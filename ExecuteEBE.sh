@@ -143,8 +143,8 @@ Viscosity_Flag_Yes_1_No_0 1     # turn on viscosity in the evolution
 Include_Shear_Visc_Yes_1_No_0 1 # include shear viscous effect
 Shear_to_S_ratio $eta_s           # value of \eta/s
 T_dependent_Shear_to_S_ratio  0 # flag to use temperature dep. \eta/s(T)
-Include_Bulk_Visc_Yes_1_No_0 1  # include bulk viscous effect
-T_dependent_Bulk_to_S_ratio 8   # include Temperature-dependent \zeta/s(T)
+Include_Bulk_Visc_Yes_1_No_0 0  # include bulk viscous effect
+T_dependent_Bulk_to_S_ratio 0   # include Temperature-dependent \zeta/s(T)
 Include_second_order_terms 1    # include second order non-linear coupling terms
 Include_Rhob_Yes_1_No_0 0
 turn_on_baryon_diffusion 0
@@ -154,11 +154,11 @@ kappa_coefficient 0.0
 output_evolution_data 5                 # flag to output evolution history to file
 output_movie_flag 0
 output_evolution_T_cut 0.145
-outputBinaryEvolution  1                # output evolution file in binary format
+outputBinaryEvolution  0                # output evolution file in binary format
 output_evolution_every_N_eta  1         # output evolution file every Neta steps
 output_evolution_every_N_y  1           # output evolution file every Ny steps
 output_evolution_every_N_x  1           # output evolution file every Nx steps
-output_evolution_every_N_timesteps  200  # output evolution every Ntime steps
+output_evolution_every_N_timesteps  2   # output evolution every Ntime steps
 #
 #
 ###########################################
@@ -188,8 +188,8 @@ EOF
 ./MUSIChydro ${EVENTNUMBER}.parameters_MUSIC.ini
 mv surface_* ${EVENTNUMBER}.surface.dat
 mv ${EVENTNUMBER}.parameters_MUSIC.ini ../MUSIC_InputParameters
-
 mv *.surface.dat ../MUSIC_FOsurfaces
+mv evolution_energy_and_bulk.dat ../MUSIC_FOsurfaces
 rm *.dat
 done
 
