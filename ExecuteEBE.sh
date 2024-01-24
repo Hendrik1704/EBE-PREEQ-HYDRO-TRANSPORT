@@ -9,6 +9,7 @@ tau_EKT=0.2005
 tau_hydro=0.8
 eta_s=0.16
 grid_spacing=0.1
+hydro_oversampling=1
 
 mkdir KoMPoST_output
 mkdir KoMPoST_output_transformed
@@ -24,14 +25,11 @@ for FILE in $INPUT_TMUNU_PATH
 do
 
 echo "Processing file: $FILE"
-id=$(echo "$FILE" | grep -o -E '[0-9]+')
-EVENTNUMBER=$(echo $id | cut -d' ' -f1)
-NS=$(echo $id | cut -d' ' -f2)
-
-echo "Create KoMPoST input file for event:"
-echo $EVENTNUMBER
-echo "Create KoMPoST input file for grid with Ns:"
-echo $NS
+# Extract event number and NS from the file name
+EVENTNUMBER=$(echo "$FILE" | grep -o -E '[0-9]+' | head -n1)
+NS=$(echo "$FILE" | grep -o -E 'Ns([0-9]+)' | sed 's/Ns//')
+echo "Create KoMPoST input file for event: $EVENTNUMBER"
+echo "Create KoMPoST input file for grid with Ns: $NS"
 
 # KoMPoST input file
 # Change parameters here if needed!
@@ -73,7 +71,7 @@ find . -type f ! -name '*music_init_flowNonLinear_pimunuTransverse.txt' -delete
 cd ..
 
 echo "Transforming $FILE into MUSIC input"
-python3 KoMPoST_to_MUSIC.py ./KoMPoST_output/$EVENTNUMBER*music_init_flowNonLinear_pimunuTransverse.txt ./KoMPoST_output_transformed/$EVENTNUMBER.Tmunu.txt
+python3 KoMPoST_to_MUSIC.py ./KoMPoST_output/$EVENTNUMBER.Tmunu.music_init_flowNonLinear_pimunuTransverse.txt ./KoMPoST_output_transformed/$EVENTNUMBER.Tmunu.txt
 cd KoMPoST
 done
 
@@ -145,13 +143,14 @@ Shear_to_S_ratio $eta_s           # value of \eta/s
 T_dependent_Shear_to_S_ratio  0 # flag to use temperature dep. \eta/s(T)
 Include_Bulk_Visc_Yes_1_No_0 0  # include bulk viscous effect
 T_dependent_Bulk_to_S_ratio 0   # include Temperature-dependent \zeta/s(T)
+T_dependent_Bulk_to_S_ratio 8   # include Temperature-dependent \zeta/s(T)
 Include_second_order_terms 1    # include second order non-linear coupling terms
 Include_Rhob_Yes_1_No_0 0
 turn_on_baryon_diffusion 0
 kappa_coefficient 0.0
 #
 # switches to output evolution information
-output_evolution_data 5                 # flag to output evolution history to file
+output_evolution_data 0y                 # flag to output evolution history to file
 output_movie_flag 0
 output_evolution_T_cut 0.145
 outputBinaryEvolution  0                # output evolution file in binary format
@@ -339,7 +338,7 @@ calculate_vn_to_order = 9              # v_n's are calculated up to this order
 sample_upto_desired_particle_number = 0  # flag to run sampling until desired
                                          # particle numbers is reached
 number_of_particles_needed = 100000      # number of hadrons to sample
-number_of_repeated_sampling = 1     # How many times should the sampling be
+number_of_repeated_sampling = $hydro_oversampling     # How many times should the sampling be
                                        # repeated.
 maximum_sampling_events = 10000
 
@@ -447,7 +446,7 @@ General:
     Delta_Time:    0.1
     End_Time:      1000.0
     Randomseed:    1
-    Nevents:       1
+    Nevents:       $hydro_oversampling
 
 Output:
     Output_Interval: 10.0
