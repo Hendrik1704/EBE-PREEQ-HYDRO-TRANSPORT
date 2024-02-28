@@ -7,3 +7,5 @@ rm -rf KoMPoST_output_transformed
 rm -rf MUSIC_FOsurfaces
 rm -rf MUSIC_InputParameters
 rm -rf smash_output
+
+rm slurm-*
