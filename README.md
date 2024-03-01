@@ -27,7 +27,7 @@ At the moment the included modules are:
     - convert_OSCAR1997A_to OSCAR2013.py: Convert the output from iSS to smash input.
 
 - Hadronic transport:
-    - [smash](https://github.com/smash-transport/smash)
+    - [smash](https://github.com/smash-transport/smash) (version 3.1 with [PYTHIA](https://pythia.org/) 8.310)
 
 ## Usage
 
