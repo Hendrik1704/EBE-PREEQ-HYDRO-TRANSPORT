@@ -88,15 +88,23 @@ cd ../KoMPoST_output
 find . -type f ! -name '*music_init_flowNonLinear_pimunuTransverse.txt' -delete
 cd ..
 
-INPUT_TMUNU_PATH_MUSIC="KoMPoST_output/*"
-for FILE in $INPUT_TMUNU_PATH_MUSIC
+
+CONVERT_PATH="./KoMPoST_output/*"
+for FILE in $CONVERT_PATH
 do
 
 EVENTNUMBER=$(echo "$FILE" | grep -o -E '[0-9]+' | head -n1)
 echo "Transforming $FILE into MUSIC input"
-python3 KoMPoST_to_MUSIC.py $type_of_matching ./EOS/hotQCD/hrg_hotqcd_eos_SMASH_binary.dat $FILE ./KoMPoST_output_transformed/${EVENTNUMBER}.Tmunu.txt
+python3 KoMPoST_to_MUSIC.py $type_of_matching ./MUSIC/EOS/hotQCD/hrg_hotqcd_eos_SMASH_binary.dat $FILE ./KoMPoST_output_transformed/${EVENTNUMBER}.Tmunu.txt
+
+done
 
 cd MUSIC
+INPUT_TMUNU_PATH_MUSIC="../KoMPoST_output_transformed/*"
+for FILE in $INPUT_TMUNU_PATH_MUSIC
+do
+
+EVENTNUMBER=$(echo "$FILE" | grep -o -E '[0-9]+' | head -n1)
 echo "Processing file: ${EVENTNUMBER}.Tmunu.txt"
 echo "Create MUSIC input file MODE 2"
 
@@ -117,7 +125,7 @@ mode 2          # this mode is evolution only
 Initial_profile $init_profile_hydro  # Read in initial profile from a file
 initialize_with_entropy 0            # 0: with energy density
 #
-Initial_Distribution_input_filename ${EVENTNUMBER}.Tmunu.txt
+Initial_Distribution_input_filename ../KoMPoST_output_transformed/${EVENTNUMBER}.Tmunu.txt
 #
 s_factor  1.0   # normalization factor for initial profile
 #
@@ -422,13 +430,15 @@ mv OSCAR.DAT ../iSS_output/OSCAR${EVENTNUMBER}
 done
 
 echo "Convert OSCAR format from 1997A version to 2013 version"
-OUTPUT_PATH_ISS="./iSS_output/*"
+cp ../convert_OSCAR1997A_to_OSCAR2013.py .
+OUTPUT_PATH_ISS="../iSS_output/*"
 for FILE in $OUTPUT_PATH_ISS
 do
-python3 ../convert_OSCAR1997A_to_OSCAR2013.py $FILE ./iSS_output_converted/
+python3 convert_OSCAR1997A_to_OSCAR2013.py $FILE ../iSS_output_converted/
 done
 
 rm parameters_iSS.ini
+rm convert_OSCAR1997A_to_OSCAR2013.py
 cd ../smash/build
 
 OSCAR_FILES_PATH="../../iSS_output_converted/*"
@@ -474,4 +484,5 @@ EOF
 mkdir ../../smash_output/Event${EVENTNUMBER}
 ./smash -i ./parameters_smash.yaml -o ../../smash_output/Event${EVENTNUMBER}
 rm parameters_smash.yaml
+
 done
