@@ -3,10 +3,10 @@
 #SBATCH -t 30:00:00
 #SBATCH -p normal
 #SBATCH -N 1
-#SBATCH -n 4
+#SBATCH -n 1
 #SBATCH -J test
 #SBATCH -A hpc-prf-flucurhi
-#SBATCH --array=0-2
+#SBATCH --array=0-1
 
 module load numlib/GSL/2.7-GCC-11.3.0
 module load toolchain/intel/2022.00
@@ -21,6 +21,8 @@ conda activate myenv
 INPUT_DIR="input_energy_momentum_tensors"
 FILES=("$INPUT_DIR"/*.dat)
 
+file_count=$(find "$INPUT_DIR" -maxdepth 1 -type f -name "*.dat" | wc -l)
+
 CURRENT_FILE="${FILES[$SLURM_ARRAY_TASK_ID]}"
 
 if [ ! -f "$CURRENT_FILE" ]; then
@@ -28,4 +30,4 @@ if [ ! -f "$CURRENT_FILE" ]; then
     exit 1
 fi
 
-./ExecuteEBE.sh "$CURRENT_FILE"
+./ExecuteEBE_cluster.sh "$CURRENT_FILE"
