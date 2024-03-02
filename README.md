@@ -54,4 +54,6 @@ which essentially will run `ExecuteEBE_cluster.sh` where you will do the configu
 
 :exclamation: The execution script `noctua_script.sh` is specifically designed for the noctua cluster at the Paderborn University in Germany. You might have to write your own script to run it on a different machine. For the python scripts you might have to create your own virtual environment. This script is only meant as an example.
 
+:exclamation: To prepare the framework on the cluster, you can use the `noctua_PrepareFrameworkProductionRun.sh` job script, which downloads and installs all the modules.
+
 If you have to abort a computation you can clear the result directories by running the `CleanResults.sh` script. Keep in mind that this script also deletes the outputs of SMASH at the end.
