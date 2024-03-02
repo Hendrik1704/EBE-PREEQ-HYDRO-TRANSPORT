@@ -105,7 +105,7 @@ for FILE in $INPUT_TMUNU_PATH_MUSIC
 do
 
 EVENTNUMBER=$(echo "$FILE" | grep -o -E '[0-9]+' | head -n1)
-echo "Processing file: ${EVENTNUMBER}.Tmunu.txt"
+echo "Processing file: $FILE"
 echo "Create MUSIC input file MODE 2"
 
 # MUSIC input file
@@ -125,7 +125,7 @@ mode 2          # this mode is evolution only
 Initial_profile $init_profile_hydro  # Read in initial profile from a file
 initialize_with_entropy 0            # 0: with energy density
 #
-Initial_Distribution_input_filename ../KoMPoST_output_transformed/${EVENTNUMBER}.Tmunu.txt
+Initial_Distribution_input_filename $FILE
 #
 s_factor  1.0   # normalization factor for initial profile
 #
