@@ -23,34 +23,35 @@ else
     exit 1
 fi
 
-mkdir KoMPoST_output
-mkdir KoMPoST_output_transformed
-mkdir MUSIC_FOsurfaces
-mkdir MUSIC_InputParameters
-mkdir iSS_output
-mkdir iSS_output_converted
-mkdir smash_output
+FILE=$1
+PATH_BASE=$(pwd)
 
-INPUT_TMUNU_PATH="input_energy_momentum_tensors/*"
-for FILE in $INPUT_TMUNU_PATH
-do
+mkdir -p KoMPoST_output
+mkdir -p KoMPoST_output_transformed
+mkdir -p MUSIC_FOsurfaces
+mkdir -p MUSIC_InputParameters
+mkdir -p iSS_output
+mkdir -p iSS_output_converted
+mkdir -p smash_output
 
 echo "Processing file: $FILE"
 # Extract event number and NS from the file name
 EVENTNUMBER=$(echo "$FILE" | grep -o -E '[0-9]+' | head -n1)
 NS=$(echo "$FILE" | grep -o -E 'Ns([0-9]+)' | sed 's/Ns//')
 
+mkdir event_${EVENTNUMBER} && cd event_${EVENTNUMBER}
+
 echo "Create KoMPoST input file for event: $EVENTNUMBER"
 echo "Create KoMPoST input file for grid with Ns: $NS"
 
 # KoMPoST input file
 # Change parameters here if needed!
-cat <<EOF >> parameters_KoMPoST.ini
+cat <<EOF >> parameters_KoMPoST_${EVENTNUMBER}.ini
 [KoMPoSTInputs]
 tIn = $tau_EKT;
 tOut = $tau_hydro;
 inputfile = ../$FILE
-outputfiletag = ../KoMPoST_output/${EVENTNUMBER}.Tmunu
+outputfiletag = ./${EVENTNUMBER}.Tmunu
 
 [KoMPoSTParameters]
 EtaOverS = $eta_s
@@ -73,44 +74,23 @@ yend = `echo ${NS} 1 | awk '{print $1-$2}'`
 EOF
 
 echo "Execute KoMPoST"
-mv parameters_KoMPoST.ini KoMPoST/
-cd KoMPoST
-./KoMPoST.exe parameters_KoMPoST.ini
-rm parameters_KoMPoST.ini
-cd ..
-
-done
-
+cp -r $PATH_BASE/KoMPoST/EKT EKT
+$PATH_BASE/KoMPoST/KoMPoST.exe parameters_KoMPoST_$EVENTNUMBER.ini
 # clear the KoMPoST directory of all files which are not needed any more
-cd KoMPoST
-rm *.txt
-cd ../KoMPoST_output
+rm parameters_KoMPoST_$EVENTNUMBER.ini
+rm -r EKT/
+# delete all the unused output to save disc space
 find . -type f ! -name '*music_init_flowNonLinear_pimunuTransverse.txt' -delete
-cd ..
 
-
-CONVERT_PATH="./KoMPoST_output/*"
-for FILE in $CONVERT_PATH
-do
-
-EVENTNUMBER=$(echo "$FILE" | grep -o -E '[0-9]+' | head -n1)
 echo "Transforming $FILE into MUSIC input"
-python3 KoMPoST_to_MUSIC.py $type_of_matching ./MUSIC/EOS/hotQCD/hrg_hotqcd_eos_SMASH_binary.dat $FILE ./KoMPoST_output_transformed/${EVENTNUMBER}.Tmunu.txt
+python3 $PATH_BASE/KoMPoST_to_MUSIC.py $type_of_matching $PATH_BASE/MUSIC/EOS/hotQCD/hrg_hotqcd_eos_SMASH_binary.dat $EVENTNUMBER.Tmunu.music_init_flowNonLinear_pimunuTransverse.txt $EVENTNUMBER.Tmunu.txt
 
-done
-
-cd MUSIC
-INPUT_TMUNU_PATH_MUSIC="../KoMPoST_output_transformed/*"
-for FILE in $INPUT_TMUNU_PATH_MUSIC
-do
-
-EVENTNUMBER=$(echo "$FILE" | grep -o -E '[0-9]+' | head -n1)
-echo "Processing file: $FILE"
+echo "Processing file: $EVENTNUMBER.Tmunu.txt"
 echo "Create MUSIC input file MODE 2"
 
 # MUSIC input file
 # Change parameters here if needed!
-cat <<EOF >> ${EVENTNUMBER}.parameters_MUSIC.ini
+cat <<EOF >> $EVENTNUMBER.parameters_MUSIC.ini
 ###################################
 # parameters list
 ###################################
@@ -122,10 +102,10 @@ mode 2          # this mode is evolution only
 # parameters for initial conditions
 ###################################
 #
-Initial_profile $init_profile_hydro  # Read in initial profile from a file
+Initial_profile $init_profile_hydro  # Read in initial profile from a file, 9: full T^\mu\nu; 94: full T^\mu\nu and read bulk
 initialize_with_entropy 0            # 0: with energy density
 #
-Initial_Distribution_input_filename $FILE
+Initial_Distribution_input_filename $EVENTNUMBER.Tmunu.txt
 #
 s_factor  1.0   # normalization factor for initial profile
 #
@@ -136,7 +116,7 @@ s_factor  1.0   # normalization factor for initial profile
 boost_invariant 1       # whether the simulation is boost-invariant
 #
 # grid information
-Initial_time_tau_0 $tau_hydro      # starting time of the hydrodynamic evolution (fm/c)
+Initial_time_tau_0 $tau_hydro       # starting time of the hydrodynamic evolution (fm/c)
 Total_evolution_time_tau 50.    # the maximum allowed running evolution time (fm/c) (need to be set to some large number)
 Delta_Tau 0.005                 # time step to use in the evolution [fm/c]
 #
@@ -173,11 +153,11 @@ kappa_coefficient 0.0
 output_evolution_data 0                 # flag to output evolution history to file
 output_movie_flag 0
 output_evolution_T_cut 0.145
-outputBinaryEvolution  1                # output evolution file in binary format
+outputBinaryEvolution  0                # output evolution file in binary format
 output_evolution_every_N_eta  1         # output evolution file every Neta steps
 output_evolution_every_N_y  1           # output evolution file every Ny steps
 output_evolution_every_N_x  1           # output evolution file every Nx steps
-output_evolution_every_N_timesteps  10  # output evolution every Ntime steps
+output_evolution_every_N_timesteps 10   # output evolution every Ntime steps
 #
 #
 ###########################################
@@ -204,20 +184,16 @@ T_freeze 0.155                  # freeze out temperature
 EndOfData
 EOF
 
-./MUSIChydro ${EVENTNUMBER}.parameters_MUSIC.ini
+cp -r $PATH_BASE/MUSIC/EOS EOS
+cp -r $PATH_BASE/MUSIC/tables tables
+$PATH_BASE/MUSIC/MUSIChydro ${EVENTNUMBER}.parameters_MUSIC.ini
 mv surface_* ${EVENTNUMBER}.surface.dat
-mv ${EVENTNUMBER}.parameters_MUSIC.ini ../MUSIC_InputParameters
-
-mv *.surface.dat ../MUSIC_FOsurfaces
-rm *.dat
-done
-
-cd ../iSS
+rm -r EOS tables
 
 echo "Create iSS input file"
 # iSS input file
 # Change parameters here if needed!
-cat <<EOF >> parameters_iSS.ini
+cat <<EOF >> parameters_iSS_${EVENTNUMBER}.ini
 hydro_mode = 1           # mode for reading in freeze out information
                          # 1: reads outputs from MUSIC assuming
                          #    boost-invariant
@@ -358,8 +334,8 @@ calculate_vn_to_order = 9              # v_n's are calculated up to this order
 sample_upto_desired_particle_number = 0  # flag to run sampling until desired
                                          # particle numbers is reached
 number_of_particles_needed = 100000      # number of hadrons to sample
-number_of_repeated_sampling = $hydro_oversampling   # How many times should the sampling be
-                                                    # repeated.
+number_of_repeated_sampling = $hydro_oversampling     # How many times should the sampling be
+                                       # repeated.
 maximum_sampling_events = 10000
 
 sample_pT_up_to = -1                   # Up to this value will pT be sampled;
@@ -411,48 +387,30 @@ output_dN_dxtdy_4all = 0   # Output dN_dxtdy table. Only applicable
 randomSeed = 0            # If <0, use system clock.
 EOF
 
-OUTPUT_PATH_MUSIC="../MUSIC_FOsurfaces/*"
-for FILE in $OUTPUT_PATH_MUSIC
-do
-
-echo "Processing file: $FILE"
+echo "Processing file: ${EVENTNUMBER}.surface.dat"
 mkdir results
-EVENTNUMBER=$(echo "$FILE" | grep -o -E '[0-9]+' | head -n1)
 
-cp $FILE results
-cp ../MUSIC_InputParameters/${EVENTNUMBER}.parameters_MUSIC.ini results
+cp -r $PATH_BASE/iSS/iSS_tables/ iSS_tables
+cp ${EVENTNUMBER}.surface.dat results
+cp ${EVENTNUMBER}.parameters_MUSIC.ini results
 mv results/${EVENTNUMBER}.surface.dat results/surface.dat
 mv results/${EVENTNUMBER}.parameters_MUSIC.ini results/music_input
 
-./iSS.e parameters_iSS.ini
+$PATH_BASE/iSS/iSS.e parameters_iSS_${EVENTNUMBER}.ini
 rm -rf results
-mv OSCAR.DAT ../iSS_output/OSCAR${EVENTNUMBER}
-done
+rm parameters_iSS_${EVENTNUMBER}.ini
+mv OSCAR.DAT OSCAR${EVENTNUMBER}
 
+mkdir iSS_output_converted
 echo "Convert OSCAR format from 1997A version to 2013 version"
-cp ../convert_OSCAR1997A_to_OSCAR2013.py .
-OUTPUT_PATH_ISS="../iSS_output/*"
-for FILE in $OUTPUT_PATH_ISS
-do
-python3 convert_OSCAR1997A_to_OSCAR2013.py $FILE ../iSS_output_converted/
-done
+python3 $PATH_BASE/convert_OSCAR1997A_to_OSCAR2013.py OSCAR${EVENTNUMBER} ./iSS_output_converted
 
-rm parameters_iSS.ini
-rm convert_OSCAR1997A_to_OSCAR2013.py
-cd ../smash/build
-
-OSCAR_FILES_PATH="../../iSS_output_converted/*"
-for FILE in $OSCAR_FILES_PATH
-do
-
-EVENTNUMBER=$(echo "$FILE" | grep -o -E '[0-9]+' | head -n1)
-
-echo "Processing file: $FILE"
+echo "Processing file: iSS_output_converted/OSCAR${EVENTNUMBER}"
 echo "Create SMASH input file"
 
 # SMASH input file
 # Change parameters here if needed!
-cat <<EOF >> parameters_smash.yaml
+cat <<EOF >> parameters_smash_${EVENTNUMBER}.yaml
 Logging:
     default: INFO
 
@@ -476,13 +434,25 @@ Modi:
         # You can alternatively pass the path directly from the command line
         # with the "-c" command:
         # ./smash -i <path to config file> -c 'Modi: { List: { File_Directory: <path to file that is read in> } }
-        File_Directory: "../../iSS_output_converted"
+        File_Directory: "./iSS_output_converted"
         File_Prefix: "OSCAR"
         Shift_Id: $EVENTNUMBER
 EOF
 
-mkdir ../../smash_output/Event${EVENTNUMBER}
-./smash -i ./parameters_smash.yaml -o ../../smash_output/Event${EVENTNUMBER}
-rm parameters_smash.yaml
+mkdir Event${EVENTNUMBER}
+$PATH_BASE/smash/build/smash -i parameters_smash_${EVENTNUMBER}.yaml -o Event${EVENTNUMBER}
+rm parameters_smash_${EVENTNUMBER}.yaml
 
-done
+###### Move file files for a correct folder ######
+mv ${EVENTNUMBER}.Tmunu.music_init_flowNonLinear_pimunuTransverse.txt ../KoMPoST_output/
+mv ${EVENTNUMBER}.Tmunu.txt ../KoMPoST_output_transformed/
+mv ${EVENTNUMBER}.surface.dat ../MUSIC_FOsurfaces/
+mv ${EVENTNUMBER}.parameters_MUSIC.ini ../MUSIC_InputParameters/
+mv OSCAR${EVENTNUMBER} ../iSS_output/
+mv iSS_output_converted/* ../iSS_output_converted/
+mv Event${EVENTNUMBER}/ ../smash_output/
+## last moment to save more files... if nothing is added, everything will be deleted
+
+## This part can be commented, if you want to keep all the outputs.
+cd ..
+rm -r event_${EVENTNUMBER}/

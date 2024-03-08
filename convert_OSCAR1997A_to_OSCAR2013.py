@@ -4,7 +4,7 @@ import argparse
 from pathlib import Path
 import os
 
-PDG_SMASH_PATH = "./iSS/iSS_tables/pdg-SMASH.dat"
+PDG_SMASH_PATH = "./iSS_tables/pdg-SMASH.dat"
 
 PDG_SMASH = pd.read_csv(PDG_SMASH_PATH,header=None, sep='\s\s+|,', engine='python')
 PDG_SMASH.columns = ['PDG_ID','name','mass','width','gspin','baryon','strange','charm','bottom','gisospin','charge','decays']
