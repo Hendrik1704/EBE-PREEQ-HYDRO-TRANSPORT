@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -t 00:30:00
+#SBATCH -t 00:15:00
 #SBATCH -p normal
 #SBATCH -N 1
 #SBATCH -n 10
