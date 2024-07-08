@@ -443,7 +443,7 @@ mkdir Event${EVENTNUMBER}
 $PATH_BASE/smash/build/smash -i parameters_smash_${EVENTNUMBER}.yaml -o Event${EVENTNUMBER}
 rm parameters_smash_${EVENTNUMBER}.yaml
 
-###### Move file files for a correct folder ######
+###### Move files to the correct folder ######
 mv ${EVENTNUMBER}.Tmunu.music_init_flowNonLinear_pimunuTransverse.txt ../KoMPoST_output/
 mv ${EVENTNUMBER}.Tmunu.txt ../KoMPoST_output_transformed/
 mv ${EVENTNUMBER}.surface.dat ../MUSIC_FOsurfaces/
