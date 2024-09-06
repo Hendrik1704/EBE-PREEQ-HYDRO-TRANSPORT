@@ -14,65 +14,83 @@ PDG_SMASH = PDG_SMASH.dropna()
 PDG_ID = PDG_SMASH['PDG_ID'].to_numpy()
 CHARGES = PDG_SMASH['charge'].to_numpy()
 
+# Cache for the charge of the particles which are already calculated
+charge_cache = {}
 def get_PDG_ID_charge(id):
+    if id in charge_cache:
+        return charge_cache[id]
     charge = 0
-    notinlist = 0
+    notinlist = False
     for n in range(len(PDG_ID)):
         if PDG_ID[n] == id:
             charge = CHARGES[n]
             break
         if n == range(len(PDG_ID))[-1]:
-            notinlist = 1
-    if notinlist == 1:
+            notinlist = True
+    if notinlist:
         for n in range(len(PDG_ID)):
             if PDG_ID[n] == -id:
                 charge = -CHARGES[n]
                 break
     return int(charge)
 
-# load the Oscar1999A file
-parser = argparse.ArgumentParser()
-parser.add_argument('inputFilePath', type=Path)
-parser.add_argument('outputFilePath', type=Path)
-p = parser.parse_args()
+def process_oscar1997_file(input_file, output_file, buffer_size=50000):
+    num_skiplines = 3
+    with open(input_file, 'r') as infile, open(output_file, 'w') as outfile:
+        outfile.write('#!OSCAR2013 particle_lists t x y z mass p0 px py pz pdg ID charge\n')
+        outfile.write('# Units: fm fm fm fm GeV GeV GeV GeV GeV none none e\n')
 
-col_names = ['sample_idx','PDG_ID','px','py','pz','E','m','x','y','z','t']
-OSCAR1999A_FILE = pd.read_csv(p.inputFilePath,names=col_names, sep='\s\s+|,', engine='python', skiprows=3)
+        buffer = []  # Buffer to store lines
+        event_count = 0
+        for line in infile:
+            if num_skiplines > 0:
+                num_skiplines -= 1
+                continue
+            # If line has only four elements, it is a header
+            if len(line.split()) == 4:
+                # If event_count is >= 1 add a footer
+                if event_count >= 1:
+                    buffer.append(f'# event {event_count} end 0 impact 0.000\n')
 
-is_NaN = OSCAR1999A_FILE.isnull()
-row_has_NaN = is_NaN.any(axis=1)
-rows_with_NaN = OSCAR1999A_FILE[row_has_NaN]
+                # The second number in the header is the number of hadrons in the event
+                num_hadrons = int(line.split()[1])
+                event_count += 1
+                event_header = f'# event {event_count} out {num_hadrons}\n'
+                buffer.append(event_header)
 
-# count the number of events sampled from the hypersurface
-NumberSamples = 0
-event_idx = []
-for i in range(len(OSCAR1999A_FILE)):
-    if row_has_NaN.loc[i] == True:
-        NumberSamples += 1
-        event_idx.append(i)
-event_idx.append(len(OSCAR1999A_FILE))
+            parts = line.strip().split()
+            if len(parts) == 11:
+                sample_idx = int(parts[0])
+                pdg_id = int(parts[1])
+                px = float(parts[2])
+                py = float(parts[3])
+                pz = float(parts[4])
+                E = float(parts[5])
+                m = float(parts[6])
+                x = float(parts[7])
+                y = float(parts[8])
+                z = float(parts[9])
+                t = float(parts[10])
+                charge = get_PDG_ID_charge(pdg_id)
+                processed_line = f"{t:g} {x:g} {y:g} {z:g} {m:g} {E:g} {px:g} {py:g} {pz:g} {pdg_id} {sample_idx} {charge}\n"
+                buffer.append(processed_line)
 
-# generate new OSCAR2013 files
-f = open(os.path.join(p.outputFilePath,'OSCAR%s'%(int(''.join(filter(str.isdigit, str(p.inputFilePath)))))), 'w')
-f.write('#!OSCAR2013 particle_lists t x y z mass p0 px py pz pdg ID charge\n')
-f.write('# Units: fm fm fm fm GeV GeV GeV GeV GeV none none e\n')
-for ev in range(NumberSamples):
-    f.write('# event %d out %d\n'%(ev+1,OSCAR1999A_FILE.loc[event_idx[ev]].at['PDG_ID']))
-    for line in range(event_idx[ev]+1,event_idx[ev+1]):
-        f.write('%s '%(OSCAR1999A_FILE.loc[line].at['t']))
-        f.write('%s '%(OSCAR1999A_FILE.loc[line].at['x']))
-        f.write('%s '%(OSCAR1999A_FILE.loc[line].at['y']))
-        f.write('%s '%(OSCAR1999A_FILE.loc[line].at['z']))
-        f.write('%s '%(OSCAR1999A_FILE.loc[line].at['m']))
-        f.write('%s '%(OSCAR1999A_FILE.loc[line].at['E']))
-        f.write('%s '%(OSCAR1999A_FILE.loc[line].at['px']))
-        f.write('%s '%(OSCAR1999A_FILE.loc[line].at['py']))
-        f.write('%s '%(OSCAR1999A_FILE.loc[line].at['pz']))
-        id = OSCAR1999A_FILE.loc[line].at['PDG_ID']
-        f.write('%d '%(id))
-        f.write('%d '%(OSCAR1999A_FILE.loc[line].at['sample_idx']))
-        charge = get_PDG_ID_charge(int(id))
-        f.write('%d'%(charge))
-        f.write('\n')
-    f.write('# event %d end 0 impact 0.000\n'%(ev+1))
-f.close()
+            # Write buffer to file once it reaches a certain size
+            if len(buffer) >= buffer_size:
+                outfile.writelines(buffer)
+                buffer = []
+
+        # Add footer for the last event
+        buffer.append(f'# event {event_count} end 0 impact 0.000\n')
+        # Write any remaining lines in the buffer to the file
+        if len(buffer) > 0:
+            outfile.writelines(buffer)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('inputFilePath', type=Path)
+    parser.add_argument('outputFilePath', type=Path)
+    args = parser.parse_args()
+
+    # Process the input file and write to the output file
+    process_oscar1997_file(args.inputFilePath, args.outputFilePath)
