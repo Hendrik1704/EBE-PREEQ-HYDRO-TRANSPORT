@@ -117,6 +117,9 @@ cat <<EOF >> ${EVENTNUMBER}.parameters_MUSIC.ini
 #
 echo_level 1    # controls the amount of messages in the terminal
 mode 2          # this mode is evolution only
+beastMode 1     # 0: no beast mode 
+                # 1: float precision
+                # 2: float precision, increased time step after 4 fm
 #
 ###################################
 # parameters for initial conditions
@@ -158,6 +161,7 @@ EOS_to_use 91                 # type of the equation of state
                               # 14: lattice EOS hotQCD at finite muB
 #
 # transport coefficients
+quest_revert_strength 1
 Viscosity_Flag_Yes_1_No_0 1     # turn on viscosity in the evolution
 Include_Shear_Visc_Yes_1_No_0 1 # include shear viscous effect
 Shear_to_S_ratio $eta_s         # value of \eta/s
@@ -460,7 +464,7 @@ General:
     Modus:         List
     Time_Step_Mode: None
     Delta_Time:    0.1
-    End_Time:      1000.0
+    End_Time:      2000.0
     Randomseed:    1
     Nevents:       $hydro_oversampling
 
