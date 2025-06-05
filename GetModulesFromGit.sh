@@ -7,10 +7,12 @@ git checkout 2f2d65692f5a6f4c0fe99072f92bb6587b7aa2c4
 cd ..
 
 echo "Download MUSIC from GitHub:"
-git clone --depth 1 https://github.com/Hendrik1704/MUSIC
+git clone --branch chun_dev --single-branch https://github.com/Hendrik1704/MUSIC
 cd MUSIC
-git checkout 13d5cb64c3a86f98bb967bfc46fb28cd4a20713a
-cd ..
+git checkout 63e9a63cdeca28432e300bb0ecadabbeced6171d
+cd EOS
+bash download_hotQCD.sh SMASH_binary
+cd ../..
 
 echo "Download iSS from GitHub:"
 git clone --depth 1 https://github.com/chunshen1987/iSS.git
@@ -23,8 +25,10 @@ git clone --depth 1 https://github.com/smash-transport/smash.git --branch SMASH-
 
 echo "Download Pythia (used for SMASH):"
 wget https://pythia.org/download/pythia83/pythia8310.tgz
+tar xf pythia8310.tgz
 
 echo "Download stable Eigen library version 3.4.0:"
 wget https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz
+tar xf eigen-3.4.0.tar.gz
 
 echo "Downloaded all the modules successfully"

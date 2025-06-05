@@ -15,10 +15,12 @@ At the moment the included modules are:
     - [KoMPoST](https://github.com/Hendrik1704/KoMPoST.git) This is a slightly modified KoMPoST version, where $\nu_{\mathrm{eff}}=40$.
 
 - Code to do the pre-equilibrium/hydro matching:
-    - KoMPoST_to_MUSIC.py: From a conformal pre-equilibrium to a non-conformal hydrodynamics the user can choose to do the matching using energy or entropy. The output will be a modified energy density that will be used in MUSIC.
+    - KoMPoST_to_MUSIC.py: From a conformal pre-equilibrium to a non-conformal hydrodynamics the user can choose to do the matching using energy or entropy. The output will be a modified energy density that will be used in MUSIC. We describe the matching procedure in more detail
+    in [Eur.Phys.J.C 84 (2024) 1128](https://inspirehep.net/literature/2807712).
 
 - Relativistic viscous hydrodynamics:
-    - [MUSIC](https://github.com/MUSIC-fluid/MUSIC) Modified version which can read in the bulk pressure and modified energy density from the `KoMPoST_to_MUSIC.py` script.
+    - [MUSIC](https://github.com/MUSIC-fluid/MUSIC) Modified version which can read in the bulk pressure and modified energy density from the `KoMPoST_to_MUSIC.py` script. We use a fixed commit from the development branch which has a beast mode built in.
+    The beast mode is a more performance optimized version of MUSIC.
 
 - Cooper-Frye particlization:
     - [iSS](https://github.com/chunshen1987/iSS)
