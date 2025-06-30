@@ -1,25 +1,32 @@
 #!/bin/bash
 
 echo "Execute the EBE evolution for the energy momentum tensors stored in 'input_energy_momentum_tensors'"
-echo "The energy momentum tensors names should be of the format 'Tmunu_Event#_Ns#.dat'"
-echo "The first number is the EventID and the second one the number of grid points in each direction Ns"
+echo "The energy momentum tensors names should be of the format 'Tmunu_Event#_Ns#.dat' or 'Tmunu_Event#_Ns#_NsLong#.dat'"
+echo "The first number is the EventID and the second/third one the number of grid points in each direction Ns/NsLong"
 echo "The first line of the energy momentum tensors should contain a header!"
 
 ### Parameters to define ###
 tau_EKT=0.2
-tau_hydro=1.0
+tau_hydro=0.6
 eta_s=0.16
 grid_spacing=0.1
+grid_spacingLong=0.2
 hydro_oversampling=10
-type_of_matching=1   ## 0:e_matching or 1:s_matching
+type_of_matching=2   ## 0:e_matching, 2D or 1:s_matching, 2D or 2:e_matching, 3D
+profile_3D=1         ## 0:2D profile, with Kompost or 1:3D profile without Kompost
 ###############
 
-if [ $type_of_matching -eq 1 ]; then
-    init_profile_hydro=94
-elif [ $type_of_matching -eq 0 ]; then
+if [ $type_of_matching -eq 0 ]; then
     init_profile_hydro=9
+    boost_invariance=1
+elif [ $type_of_matching -eq 1 ]; then
+    init_profile_hydro=94
+    boost_invariance=1
+elif [ $type_of_matching -eq 2 ]; then
+    init_profile_hydro=95
+    boost_invariance=0
 else
-    echo "Invalid value for type_of_matching. Should be either 0 or 1."
+    echo "Invalid value for type_of_matching. Should be either 0, 1 or 2."
     exit 1
 fi
 
@@ -32,6 +39,7 @@ mkdir iSS_output_converted
 mkdir smash_output
 
 INPUT_TMUNU_PATH="input_energy_momentum_tensors/*"
+if [ $profile_3D -eq 0 ]; then
 for FILE in $INPUT_TMUNU_PATH
 do
 
@@ -39,6 +47,9 @@ echo "Processing file: $FILE"
 # Extract event number and NS from the file name
 EVENTNUMBER=$(echo "$FILE" | grep -o -E '[0-9]+' | head -n1)
 NS=$(echo "$FILE" | grep -o -E 'Ns([0-9]+)' | sed 's/Ns//')
+size_x=$(echo "scale=3; ($NS -1) * $grid_spacing" | bc)
+NSLONG=1
+size_eta=0
 
 echo "Create KoMPoST input file for event: $EVENTNUMBER"
 echo "Create KoMPoST input file for grid with Ns: $NS"
@@ -99,6 +110,30 @@ python3 KoMPoST_to_MUSIC.py $type_of_matching ./MUSIC/EOS/hotQCD/hrg_hotqcd_eos_
 
 done
 
+elif [ $profile_3D -eq 1 ]; then
+   for FILE in $INPUT_TMUNU_PATH
+   do
+   echo "Processing file: $FILE"
+   # Extract event number and NS from the file name
+   EVENTNUMBER=$(echo "$FILE" | grep -o -E '[0-9]+' | head -n1)
+   NS=$(echo "$FILE" | grep -o -E 'Ns([0-9]+)' | sed 's/Ns//')
+   size_x=$(echo "scale=3; ($NS -1) * $grid_spacing" | bc)
+   NSLONG=$(echo "../$FILE" | grep -o -E 'NsLong([0-9]+)' | sed 's/NsLong//')
+   size_eta=$(echo "scale=3; ($NSLONG -1) * $grid_spacingLong" | bc)
+
+   dx=$(echo "scale=3; $size_x / ($NS - 1)" | bc)
+   deta=$(echo "scale=3; $size_eta / ($NSLONG - 1)" | bc)
+
+   echo "Transforming $FILE into MUSIC input"
+   python3 McDipper_to_MUSIC.py ./MUSIC/EOS/hotQCD/hrg_hotqcd_eos_SMASH_binary.dat $NS $NSLONG $dx $deta $FILE ./KoMPoST_output_transformed/$EVENTNUMBER.Tmunu.txt
+   
+   done
+   
+else
+    echo "Invalid value for profile_3D. Should be either 0 or 1."
+    exit 1
+fi
+
 cd MUSIC
 INPUT_TMUNU_PATH_MUSIC="../KoMPoST_output_transformed/*"
 for FILE in $INPUT_TMUNU_PATH_MUSIC
@@ -136,13 +171,31 @@ s_factor  1.0   # normalization factor for initial profile
 # parameters for hydrodynamic evolution
 #######################################
 #
-boost_invariant 1       # whether the simulation is boost-invariant
+boost_invariant $boost_invariance  # whether the simulation is boost-invariant
 #
 # grid information
 Initial_time_tau_0 $tau_hydro      # starting time of the hydrodynamic evolution (fm/c)
 Total_evolution_time_tau 50.    # the maximum allowed running evolution time (fm/c) (need to be set to some large number)
 Delta_Tau 0.005                 # time step to use in the evolution [fm/c]
 #
+Eta_grid_size $size_eta       # spatial rapidity range
+                              # [-Eta_grid_size/2, Eta_grid_size/2 - delta_eta]
+Grid_size_in_eta $NSLONG      # number of the grid points in spatial
+                              # rapidity direction
+                              # Must have at least 4 cells per processor.
+                              # Must be an even number.
+                              # One cell is positioned at eta=0,
+                              # half the cells are at negative eta,
+                              # the rest (one fewer) are at positive eta
+X_grid_size_in_fm $size_x     # spatial range along x direction in the
+                              # transverse plane
+                              # [-X_grid_size_in_fm/2, X_grid_size_in_fm/2]
+Y_grid_size_in_fm $size_x     # spatial range along y direction in the
+                              # transverse plane
+                              # [-Y_grid_size_in_fm/2, Y_grid_size_in_fm/2]
+Grid_size_in_y $NS            # number of the grid points in y direction
+Grid_size_in_x $NS            # number of the grid points in x direction
+##
 EOS_to_use 91                 # type of the equation of state
                               # 0: ideal gas
                               # 1: EOS-Q from azhydro
