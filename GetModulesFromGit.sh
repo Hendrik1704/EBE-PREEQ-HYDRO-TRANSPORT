@@ -17,15 +17,15 @@ cd ../..
 echo "Download iSS from GitHub:"
 git clone --depth 1 https://github.com/chunshen1987/iSS.git
 cd iSS
-git checkout 7d39d84ff95925bf3bc0edfaf8aae1ac5a28b387
+git checkout 8b3e43b26dade8252e2671907518a0d111625fd1
 cd ..
 
 echo "Download SMASH from GitHub:"
-git clone --depth 1 https://github.com/smash-transport/smash.git --branch SMASH-3.1
+git clone --depth 1 https://github.com/smash-transport/smash.git --branch SMASH-2.2
 
 echo "Download Pythia (used for SMASH):"
-wget https://pythia.org/download/pythia83/pythia8310.tgz
-tar xf pythia8310.tgz
+wget https://pythia.org/download/pythia83/pythia8307.tgz
+tar xf pythia8307.tgz
 
 echo "Download stable Eigen library version 3.4.0:"
 wget https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz

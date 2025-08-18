@@ -242,9 +242,9 @@ echo "Create iSS input file"
 # iSS input file
 # Change parameters here if needed!
 cat <<EOF >> parameters_iSS_${EVENTNUMBER}.ini
-hydro_mode = 1           # mode for reading in freeze out information
-                         # 1: reads outputs from MUSIC assuming
-                         #    boost-invariant
+hydro_mode = 2           # mode for reading in freeze out information
+                         # 1: reads outputs from MUSIC assuming boost-invariant
+                         # 2: reads outputs from MUSIC full (3+1)-d
 
 afterburner_type = 2     # 0: PDG_Decay
                          # 1: UrQMD
@@ -286,7 +286,7 @@ calculate_vn = 0         # 1/0: whether to calculate the
                          # dN/(pt dpt dphi dy) and v_n flows
                          # (they not required for MC-sampling)
 
-MC_sampling = 2          # 0/1/2/3: whether to perform Monte-Carlo sampling
+MC_sampling = 4          # 0/1/2/3: whether to perform Monte-Carlo sampling
                          # (not required for spectra calculation).
                          # 0: No sampling.
                          # 1: use dN_dxtdetady to sample.
@@ -459,6 +459,8 @@ echo "Create SMASH input file"
 # SMASH input file
 # Change parameters here if needed!
 cat <<EOF >> parameters_smash_${EVENTNUMBER}.yaml
+Version: 1.8 # minimal SMASH version to use with this config file
+
 Logging:
     default: INFO
 
