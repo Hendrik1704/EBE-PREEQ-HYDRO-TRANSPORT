@@ -459,8 +459,6 @@ echo "Create SMASH input file"
 # SMASH input file
 # Change parameters here if needed!
 cat <<EOF >> parameters_smash_${EVENTNUMBER}.yaml
-Version: 1.8 # minimal SMASH version to use with this config file
-
 Logging:
     default: INFO
 
